@@ -1,4 +1,3 @@
-
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -32,36 +31,22 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// React frontend build folder
 const clientDistPath = path.resolve(
   __dirname,
   "../client/dist"
 );
 
-// CORS configuration
-const allowedOrigins = (
-  process.env.CLIENT_URL || "http://localhost:5173"
-)
-  .split(",")
-  .map((origin) => origin.trim().replace(/\/$/, ""));
-
-app.use(
-  cors({
-    origin(origin, callback) {
-      // Allow requests without an Origin, such as server-side requests.
-      if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("Not allowed by CORS"));
-    },
-  })
-);
+app.use(cors({
+  origin: process.env.CLIENT_URL
+    ? process.env.CLIENT_URL.split(",").map(
+        (origin) => origin.trim().replace(/\/$/, "")
+      )
+    : true,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Uploaded files
 app.use(
   "/uploads",
   express.static(path.resolve(__dirname, "uploads"))
@@ -91,13 +76,8 @@ app.use("/api/contact", contactRoutes);
 if (existsSync(path.join(clientDistPath, "index.html"))) {
   app.use(express.static(clientDistPath));
 
-  // React Router fallback for frontend routes
+  // React Router fallback — Express 5 syntax
   app.get("/{*path}", (req, res, next) => {
-    if (req.path.startsWith("/api/") ||
-        req.path.startsWith("/uploads/")) {
-      return next();
-    }
-
     res.sendFile(
       path.join(clientDistPath, "index.html"),
       (err) => {
@@ -105,9 +85,14 @@ if (existsSync(path.join(clientDistPath, "index.html"))) {
       }
     );
   });
+} else {
+  console.error(
+    "Frontend build not found:",
+    path.join(clientDistPath, "index.html")
+  );
 }
 
-// Error handlers must come last
+// Error handlers
 app.use(notFound);
 app.use(errorHandler);
 
