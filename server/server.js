@@ -1,3 +1,4 @@
+
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -28,25 +29,36 @@ import {
 
 const app = express();
 
+// Resolve current file and directories
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Expected production frontend build directory
 const clientDistPath = path.resolve(
   __dirname,
   "../client/dist"
 );
 
-app.use(cors({
-  origin: process.env.CLIENT_URL
-    ? process.env.CLIENT_URL.split(",").map(
-        (origin) => origin.trim().replace(/\/$/, "")
-      )
-    : true,
-}));
+const frontendIndexPath = path.join(
+  clientDistPath,
+  "index.html"
+);
 
-app.use(express.json());
+// Middleware
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL
+      ? process.env.CLIENT_URL.split(",").map((origin) =>
+          origin.trim().replace(/\/+$/, "")
+        )
+      : true,
+  })
+);
+
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
+// Resume uploads
 app.use(
   "/uploads",
   express.static(path.resolve(__dirname, "uploads"))
@@ -54,7 +66,10 @@ app.use(
 
 // Health check
 app.get("/api/health", (req, res) => {
-  res.json({ message: "IntervueX API is running" });
+  res.status(200).json({
+    success: true,
+    message: "IntervueX API is running",
+  });
 });
 
 // API routes
@@ -72,40 +87,56 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/contact", contactRoutes);
 
-// Serve React frontend
-if (existsSync(path.join(clientDistPath, "index.html"))) {
+// Serve the built React frontend
+if (existsSync(frontendIndexPath)) {
   app.use(express.static(clientDistPath));
 
-  // React Router fallback — Express 5 syntax
+  // React Router fallback for frontend routes
   app.get("/{*path}", (req, res, next) => {
-    res.sendFile(
-      path.join(clientDistPath, "index.html"),
-      (err) => {
-        if (err) next(err);
+    // Unknown API routes must reach the API 404 handler
+    if (req.path === "/api" || req.path.startsWith("/api/")) {
+      return next();
+    }
+
+    res.sendFile(frontendIndexPath, (err) => {
+      if (err) {
+        next(err);
       }
-    );
+    });
   });
+
+  console.log("Frontend build found:", frontendIndexPath);
 } else {
   console.error(
     "Frontend build not found:",
-    path.join(clientDistPath, "index.html")
+    frontendIndexPath
   );
+
+  // Avoid silently returning the API 404 for the homepage
+  app.get("/", (req, res) => {
+    res.status(503).json({
+      success: false,
+      message:
+        "Frontend build is missing. Check the Render build command.",
+    });
+  });
 }
 
-// Error handlers
+// 404 and error handlers must remain last
 app.use(notFound);
 app.use(errorHandler);
 
+// Start server after connecting to MongoDB
 const PORT = process.env.PORT || 5000;
 
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(`IntervueX server running on port ${PORT}`);
       console.log(`Frontend directory: ${clientDistPath}`);
     });
   })
   .catch((error) => {
-    console.error("Database connection failed:", error.message);
+    console.error("Database connection failed:", error);
     process.exit(1);
   });
