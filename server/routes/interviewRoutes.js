@@ -1,0 +1,14 @@
+import {Router} from "express"; 
+import {protect} from "../middleware/authMiddleware.js";
+import {allowRoles} from "../middleware/roleMiddleware.js";
+import {listInterviewQuestions,getInterviewQuestion,categories,createInterviewQuestion,updateInterviewQuestion,deleteInterviewQuestion} from "../controllers/interviewController.js"; 
+const router=Router(); 
+router.get("/categories",categories); 
+router.get("/questions",listInterviewQuestions); 
+router.get("/questions/:id",getInterviewQuestion); 
+router.get("/",listInterviewQuestions); 
+router.get("/:id",getInterviewQuestion); 
+router.post("/",protect,allowRoles("admin"),createInterviewQuestion); 
+router.put("/:id",protect,allowRoles("admin"),updateInterviewQuestion); 
+router.delete("/:id",protect,allowRoles("admin"),deleteInterviewQuestion); 
+export default router;

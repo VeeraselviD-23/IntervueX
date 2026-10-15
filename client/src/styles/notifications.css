@@ -1,0 +1,36 @@
+.notifications-page {
+  padding: 35px 0
+}
+.notification-list {
+  background: #fff;
+  border: 1px solid #e7e9f1;
+  border-radius: 14px;
+  overflow: hidden
+}
+.notification-item {
+  display: flex;
+  gap: 14px;
+  padding: 17px;
+  border-bottom: 1px solid #eee
+}
+.notification-item:last-child {
+  border-bottom: 0
+}
+.notification-item.unread {
+  background: #fff8f7
+}
+.notification-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e53935;
+  margin-top: 8px;
+  flex: none
+}
+.notification-title {
+  font-weight: 700
+}
+.notification-time {
+  font-size: 12px;
+  color: #888
+}

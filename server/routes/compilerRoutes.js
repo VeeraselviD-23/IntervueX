@@ -1,0 +1,16 @@
+import {Router} from "express"; 
+import {protect} from "../middleware/authMiddleware.js";
+import {allowRoles} from "../middleware/roleMiddleware.js";
+import {listCodingQuestions,getCodingQuestion,createCodingQuestion,updateCodingQuestion,deleteCodingQuestion,runCode,submitCode,submissions} from "../controllers/compilerController.js"; 
+const router=Router(); 
+router.get("/questions",listCodingQuestions); 
+router.get("/questions/:id",getCodingQuestion); 
+router.post("/run",runCode); 
+router.post("/submit",protect,submitCode); 
+router.get("/submissions",protect,submissions); 
+router.get("/",listCodingQuestions); 
+router.get("/:id",getCodingQuestion); 
+router.post("/",protect,allowRoles("admin"),createCodingQuestion); 
+router.put("/:id",protect,allowRoles("admin"),updateCodingQuestion); 
+router.delete("/:id",protect,allowRoles("admin"),deleteCodingQuestion); 
+export default router;

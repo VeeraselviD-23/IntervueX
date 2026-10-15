@@ -1,0 +1,14 @@
+import {Router} from "express"; 
+import {protect} from "../middleware/authMiddleware.js"; 
+import {listApplications,dashboard,myApplications,getApplication,createApplication,updateApplication,deleteApplication,jobApplicants} from "../controllers/applicationController.js";
+const router=Router(); 
+router.use(protect); 
+router.get("/dashboard",dashboard); 
+router.get("/my",myApplications); 
+router.get("/job/:jobId",jobApplicants); 
+router.get("/",listApplications); 
+router.get("/:id",getApplication); 
+router.post("/",createApplication); 
+router.put("/:id",updateApplication); 
+router.delete("/:id",deleteApplication); 
+export default router;

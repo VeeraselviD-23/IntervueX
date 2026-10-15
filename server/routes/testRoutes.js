@@ -1,0 +1,14 @@
+import {Router} from "express"; 
+import {protect} from "../middleware/authMiddleware.js"; 
+import {allowRoles} from "../middleware/roleMiddleware.js";
+import {listTests,getTest,createTest,updateTest,deleteTest,startTest,submitTest,getTestResult} from "../controllers/testController.js"; 
+const router=Router(); 
+router.get("/",listTests); 
+router.get("/results/:id",protect,getTestResult); 
+router.post("/",protect,allowRoles("admin"),createTest); 
+router.put("/:id",protect,allowRoles("admin"),updateTest); 
+router.delete("/:id",protect,allowRoles("admin"),deleteTest); 
+router.post("/:id/start",protect,startTest); 
+router.post("/:id/submit",protect,submitTest); 
+router.get("/:id",getTest); 
+export default router;

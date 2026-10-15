@@ -1,0 +1,60 @@
+.recruiter-page {
+  padding: 35px 0
+}
+.recruiter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px
+}
+.recruiter-stats {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 18px;
+  margin-bottom: 25px
+}
+.post-job-form {
+  max-width: 850px
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px
+}
+.candidate-table,
+.jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden
+}
+.candidate-table td,
+.candidate-table th,
+.jobs-table td,
+.jobs-table th {
+  padding: 13px 15px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  font-size: 14px
+}
+.candidate-table th,
+.jobs-table th {
+  background: #fafafa;
+  font-weight: 700
+}
+.action-group {
+  display: flex;
+  gap: 7px
+}
+@media(max-width:700px) {
+  .recruiter-stats {
+    grid-template-columns: 1fr
+  }
+  .form-row {
+    grid-template-columns: 1fr
+  }
+  .table-wrap {
+    overflow: auto
+  }
+}

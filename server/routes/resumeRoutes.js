@@ -1,0 +1,12 @@
+import {Router} from "express"; 
+import {protect} from "../middleware/authMiddleware.js"; 
+import {uploadResume} from "../middleware/uploadMiddleware.js";
+import {listResumes,getResume,createResume,updateResume,deleteResume} from "../controllers/resumeController.js"; 
+const router=Router(); 
+router.use(protect); 
+router.get("/",listResumes); 
+router.get("/:id",getResume); 
+router.post("/",uploadResume.single("resume"),createResume); 
+router.put("/:id",updateResume); 
+router.delete("/:id",deleteResume); 
+export default router;
